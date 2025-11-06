@@ -227,9 +227,15 @@ class Agent(LlmAgent):
         if self.long_term_memory is not None:
             from google.adk.tools import load_memory
 
-            if not load_memory.custom_metadata:
-                load_memory.custom_metadata = {}
-            load_memory.custom_metadata["backend"] = self.long_term_memory.backend
+            if hasattr(load_memory, "custom_metadata"):
+                if not load_memory.custom_metadata:
+                    load_memory.custom_metadata = {}
+                load_memory.custom_metadata["backend"] = self.long_term_memory.backend
+            else:
+                logger.warning(
+                    "load_memory tool does not have custom_metadata attribute, you can update your Google-ADK version, "
+                    "long_term_memory backend information will not be set."
+                )
             self.tools.append(load_memory)
 
         logger.info(f"VeADK version: {VERSION}")
